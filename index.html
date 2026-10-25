@@ -186,10 +186,13 @@ async function ensureMic(){
 
 function stopRec(){ if(rec){stopping=true; try{rec.stop()}catch(e){}} }
 
-async function startRec(from){
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function startRec(from){
   if(!SR)return;
   if(active){const was=active; stopRec(); if(was===from)return;}
-  if(!(await ensureMic()))return;
+  // Speech recognition must start directly inside the tap (iOS refuses it otherwise),
+  // so ask for the microphone first and let the person tap again.
+  if(!micOk){ ensureMic().then(ok=>{ if(ok) setStatus("Микрофон зөвшөөрөгдлөө. Товчоо дахин дарж ярина уу."); }); return; }
   if(window.speechSynthesis)speechSynthesis.cancel();
   const r=new SR();
   r.lang=from==="en"?"en-US":"mn-MN";
@@ -213,12 +216,13 @@ async function startRec(from){
     const m={"not-allowed":"Микрофоны зөвшөөрөл өгөөгүй байна. Хөтчийн тохиргооноос зөвшөөрнө үү.",
       "no-speech":"Яриа сонсогдсонгүй. Дахин оролдоно уу.",
       "language-not-supported":"Энэ төхөөрөмж энэ хэлийг танихгүй байна.",
-      "network":"Интернэт холболт шаардлагатай."};
+      "network":"Интернэт холболт шаардлагатай.",
+      "service-not-allowed":"Дуу таних хаалттай байна. iPhone: Settings → General → Keyboard → Enable Dictation-ийг асаагаад хуудсаа дахин ачаална уу."};
     if(ev.error!=="aborted")setStatus(m[ev.error]||("Алдаа: "+ev.error));
   };
   r.onend=()=>{
     // keep continuous listening alive until user stops (browsers end it after silence)
-    if(r.continuous && !stopping && rec===r){ try{r.start();return}catch(e){} }
+    if(r.continuous && !isIOS && !stopping && rec===r){ try{r.start();return}catch(e){} }
     $("btnEn").classList.remove("on"); $("btnMn").classList.remove("on");
     $("live").textContent="";
     if(rec===r){rec=null;active=null}
