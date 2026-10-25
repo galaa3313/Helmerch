@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Хэлмэрч EN–MN</title>
+<meta name="theme-color" content="#14213a">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#14213a; --muted:#5b6880;
+  --line:#dfe4ec; --mn:#1f4fa8; --mn-soft:#e4ecfa; --en:#b4561d; --en-soft:#f8ebe1; --rec:#d23b3b;
+  --display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1420; --surface:#172033; --ink:#e8edf6; --muted:#9aa6bd;
+  --line:#26314a; --mn:#7ea6ff; --mn-soft:#1c2c4f; --en:#f0a06a; --en-soft:#3a2516; --rec:#ff6b6b; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.app{height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{padding-block:14px 8px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:700;font-size:20px;margin:0}
+h1 span{color:var(--mn)}
+.opt{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.log{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-block:6px 12px}
+.msg{min-width:0;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;max-width:92%}
+.msg.from-en{background:var(--en-soft);align-self:flex-start}
+.msg.from-mn{background:var(--mn-soft);align-self:flex-end}
+.tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.src{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.out{font-size:22px;line-height:1.35;font-weight:500;overflow-wrap:anywhere}
+.from-en .out{color:var(--mn)} .from-mn .out{color:var(--en)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts button{font:500 13px var(--body);background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 10px}
+.empty{margin:auto;text-align:center;color:var(--muted);font-size:14px;line-height:1.5;max-width:30ch}
+.perm{display:flex;flex-direction:column;gap:8px;background:var(--mn-soft);border-radius:14px;padding:12px 14px;font-size:14px}
+.perm[hidden]{display:none}
+.perm button{font:600 15px var(--body);background:var(--mn);color:#fff;border:0;border-radius:10px;padding:10px 14px;align-self:flex-start}
+.live{min-height:1.4em;font-size:15px;color:var(--muted);font-style:italic;padding-block:4px;overflow-wrap:anywhere}
+.status{font-size:13px;color:var(--rec);min-height:1em}
+.dock{padding-block:8px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rec{border:0;border-radius:18px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  font:600 15px var(--body);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rec small{font-weight:400;font-size:12px;opacity:.9}
+.rec .dot{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:22px}
+#btnEn{background:var(--en)} #btnMn{background:var(--mn)}
+.rec.on{background:var(--rec)!important}
+.rec.on .dot{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.15);background:rgba(255,255,255,.4)}}
+@media (prefers-reduced-motion:reduce){.rec.on .dot{animation:none}}
+button:focus-visible{outline:2px solid var(--mn);outline-offset:2px}
+.big{position:fixed;inset:0;background:var(--surface);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;z-index:20;gap:24px}
+.big[hidden]{display:none}
+.big p{font-family:var(--display);font-weight:500;font-size:clamp(26px,7vw,44px);line-height:1.3;text-align:center;margin:0;overflow-wrap:anywhere}
+.big.flip p{transform:rotate(180deg)}
+.big .acts button{font-size:15px;padding:10px 16px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Хэлмэрч <span>EN–MN</span></h1>
+    <label class="opt"><input type="checkbox" id="cont"> Тасралтгүй</label>
+  </header>
+  <div class="perm" id="permBar" hidden>
+    <span>Ярианы бичлэг хийхэд микрофоны зөвшөөрөл хэрэгтэй.</span>
+    <button type="button" id="permBtn">🎙 Микрофон зөвшөөрөх</button>
+  </div>
+  <div class="log" id="log">
+    <div class="empty" id="empty">Англи хүн ярих үед <b>улбар шар</b> товчийг, та ярих үед <b>цэнхэр</b> товчийг дарна. Дахин дарвал бичлэг зогсоно.</div>
+  </div>
+  <div class="dock">
+    <div class="live" id="live"></div>
+    <div class="status" id="status"></div>
+    <div class="btns">
+      <button class="rec" id="btnEn" type="button"><span class="dot">🎙</span>Тэр ярих<small>English → Монгол</small></button>
+      <button class="rec" id="btnMn" type="button"><span class="dot">🎙</span>Би ярих<small>Монгол → English</small></button>
+    </div>
+  </div>
+</div>
+<div class="big" id="big" hidden>
+  <p id="bigText"></p>
+  <div class="acts">
+    <button id="bigFlip" type="button">↻ Эргүүлэх</button>
+    <button id="bigSpeak" type="button">🔊 Унших</button>
+    <button id="bigClose" type="button">Хаах</button>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null, active=null, finalText="", stopping=false;
+
+function setStatus(t){$("status").textContent=t||""}
+
+if(!SR) setStatus("Энэ хөтөч дуу таних боломжгүй. Android дээр Chrome-оор нээнэ үү.");
+
+function voiceFor(lang){
+  const vs=(window.speechSynthesis&&speechSynthesis.getVoices())||[];
+  return vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith(lang))||null;
+}
+function speak(text,lang){
+  try{
+    if(!window.speechSynthesis)return false;
+    const v=voiceFor(lang); if(lang==="mn"&&!v)return false;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==="en"?"en-US":"mn-MN"; if(v)u.voice=v; u.rate=lang==="en"?0.95:1;
+    speechSynthesis.speak(u); return true;
+  }catch(e){return false}
+}
+if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}
+
+async function translate(text,sl,tl){
+  try{
+    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl="+sl+"&tl="+tl+"&q="+encodeURIComponent(text));
+    if(!r.ok)throw 0;
+    const j=await r.json();
+    const out=j[0].map(x=>x[0]).join("").trim();
+    if(out)return out;
+  }catch(e){}
+  const r2=await fetch("https://api.mymemory.translated.net/get?langpair="+sl+"|"+tl+"&q="+encodeURIComponent(text));
+  const j2=await r2.json();
+  const out2=(j2&&j2.responseData&&j2.responseData.translatedText||"").trim();
+  if(!out2)throw new Error("empty");
+  return out2;
+}
+
+function addMsg(from,src,out){
+  const e=$("empty"); if(e)e.remove();
+  const d=document.createElement("div");
+  d.className="msg "+(from==="en"?"from-en":"from-mn");
+  const outLang=from==="en"?"mn":"en";
+  d.innerHTML='<div class="tag"></div><div class="src"></div><div class="out"></div><div class="acts"><button type="button" class="sp">🔊 Унших</button><button type="button" class="bg">⤢ Томоор</button></div>';
+  d.querySelector(".tag").textContent=from==="en"?"Тэр · English → Монгол":"Та · Монгол → English";
+  d.querySelector(".src").textContent=src;
+  d.querySelector(".out").textContent=out;
+  d.querySelector(".sp").onclick=()=>{if(!speak(out,outLang))setStatus("Энэ утсанд монгол дуу хоолой алга. Бичгээр нь уншаарай.")};
+  d.querySelector(".bg").onclick=()=>openBig(out,outLang);
+  $("log").append(d); $("log").scrollTop=$("log").scrollHeight;
+}
+
+async function handle(from,text){
+  text=text.trim(); if(!text)return;
+  const sl=from, tl=from==="en"?"mn":"en";
+  setStatus("Орчуулж байна…");
+  try{
+    const out=await translate(text,sl,tl);
+    addMsg(from,text,out); setStatus("");
+    speak(out,tl);
+  }catch(e){setStatus("Орчуулж чадсангүй. Интернэт холболтоо шалгана уу.")}
+}
+
+let micOk=false;
+async function ensureMic(){
+  if(micOk)return true;
+  if(!window.isSecureContext||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    setStatus("Микрофон зөвхөн https:// хаягаар нээсэн үед ажиллана. Файлыг шууд нээсэн бол GitHub Pages хаягаар нээнэ үү.");
+    return false;
+  }
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({audio:true});
+    s.getTracks().forEach(t=>t.stop());
+    micOk=true; $("permBar").hidden=true; setStatus(""); return true;
+  }catch(e){
+    if(e.name==="NotAllowedError"||e.name==="SecurityError")
+      setStatus("Микрофоны зөвшөөрөл хаалттай байна. Хаягийн мөрний 🔒 тэмдгийг дарж → Permissions → Microphone → Allow болгоод хуудсаа дахин ачаална уу.");
+    else if(e.name==="NotFoundError") setStatus("Микрофон олдсонгүй.");
+    else setStatus("Микрофон нээж чадсангүй: "+e.name);
+    return false;
+  }
+}
+(async()=>{
+  try{
+    const p=await navigator.permissions.query({name:"microphone"});
+    const upd=()=>{micOk=p.state==="granted"; $("permBar").hidden=micOk};
+    upd(); p.onchange=upd;
+  }catch(e){ $("permBar").hidden=false }
+})();
+
+function stopRec(){ if(rec){stopping=true; try{rec.stop()}catch(e){}} }
+
+async function startRec(from){
+  if(!SR)return;
+  if(active){const was=active; stopRec(); if(was===from)return;}
+  if(!(await ensureMic()))return;
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  const r=new SR();
+  r.lang=from==="en"?"en-US":"mn-MN";
+  r.interimResults=true;
+  r.continuous=$("cont").checked;
+  r.maxAlternatives=1;
+  rec=r; active=from; finalText=""; stopping=false;
+  $(from==="en"?"btnEn":"btnMn").classList.add("on");
+  setStatus(""); $("live").textContent=from==="en"?"Сонсож байна… (English)":"Сонсож байна… (Монгол)";
+  r.onresult=ev=>{
+    let interim="";
+    for(let i=ev.resultIndex;i<ev.results.length;i++){
+      const t=ev.results[i][0].transcript;
+      if(ev.results[i].isFinal){
+        if(r.continuous){handle(from,t)} else finalText+=t+" ";
+      } else interim+=t;
+    }
+    $("live").textContent=(finalText+interim)||"…";
+  };
+  r.onerror=ev=>{
+    const m={"not-allowed":"Микрофоны зөвшөөрөл өгөөгүй байна. Хөтчийн тохиргооноос зөвшөөрнө үү.",
+      "no-speech":"Яриа сонсогдсонгүй. Дахин оролдоно уу.",
+      "language-not-supported":"Энэ төхөөрөмж энэ хэлийг танихгүй байна.",
+      "network":"Интернэт холболт шаардлагатай."};
+    if(ev.error!=="aborted")setStatus(m[ev.error]||("Алдаа: "+ev.error));
+  };
+  r.onend=()=>{
+    // keep continuous listening alive until user stops (browsers end it after silence)
+    if(r.continuous && !stopping && rec===r){ try{r.start();return}catch(e){} }
+    $("btnEn").classList.remove("on"); $("btnMn").classList.remove("on");
+    $("live").textContent="";
+    if(rec===r){rec=null;active=null}
+    if(!r.continuous && finalText.trim()) handle(from,finalText);
+  };
+  try{r.start()}catch(e){setStatus("Бичлэг эхлүүлж чадсангүй.")}
+}
+
+$("permBtn").onclick=()=>ensureMic();
+$("btnEn").onclick=()=>startRec("en");
+$("btnMn").onclick=()=>startRec("mn");
+
+let bigLang="en";
+function openBig(t,lang){bigLang=lang;$("bigText").textContent=t;$("big").classList.toggle("flip",lang==="en");$("big").hidden=false}
+$("bigFlip").onclick=()=>$("big").classList.toggle("flip");
+$("bigSpeak").onclick=()=>{if(!speak($("bigText").textContent,bigLang))setStatus("Монгол дуу хоолой алга байна.")};
+$("bigClose").onclick=()=>{$("big").hidden=true};
+</script>
+</body>
+</html>
